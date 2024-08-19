@@ -65,7 +65,8 @@ VLLM_TARGET_DEVICE = envs.VLLM_TARGET_DEVICE
 assert sys.platform.startswith(
     "linux"), "vLLM only supports Linux platform (including WSL)."
 
-MAIN_CUDA_VERSION = "12.1"
+# MAIN_CUDA_VERSION = "12.1"
+MAIN_CUDA_VERSION = "11.7"
 
 
 def is_sccache_available() -> bool:
@@ -131,7 +132,11 @@ class cmake_build_ext(build_ext):
                 nvcc_threads = 1
             num_jobs = max(1, num_jobs // nvcc_threads)
 
-        return num_jobs, nvcc_threads
+        # return num_jobs, nvcc_threads
+        if num_jobs >= 32:
+            return 32, nvcc_threads
+        else:
+            return num_jobs, nvcc_threads
 
     #
     # Perform cmake configuration for a single extension.
